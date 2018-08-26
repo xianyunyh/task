@@ -1,0 +1,15 @@
+{
+    "name": "tianlei/task",
+    "authors": [
+        {
+            "name": "xianyunyh",
+            "email": "tianlei542475736@gmail.com"
+        }
+    ],
+  "autoload": {
+      "psr-4": {
+        "Task\\": "./src"
+      }
+    },
+    "require": {}
+}
