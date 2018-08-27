@@ -21,19 +21,16 @@ class Client
      * @var ProcessManger
      */
     protected static $processManger;
-    /**
-     * @var Server
-     */
 
-    protected $server;
-
+    protected static $config = [];
     /**
      * @var Job
      */
     protected static $job;
 
-    public static function start()
+    public static function start($config = [])
     {
+        self::$config = $config;
         $columns = [
             ["task_id",Table::TYPE_INT,4],
             ["start_time",Table::TYPE_INT,8],
@@ -49,7 +46,8 @@ class Client
         self::$job = Job::init(1024,$columns);
         //拉取远程数据
         //创建tcp server
-        self::createServer();
+        $clientConfig = self::$config['client'];
+        self::createServer($clientConfig);
         //定时器
 
         self::timeTick(5000);
@@ -59,7 +57,7 @@ class Client
     protected static function timeTick($time = 1000)
     {
         Timer::tick($time, function () {
-            $size = self::$table->count();
+            $size = Job::count();
             $count = ProcessManger::getProcessNum();
             for ($i = 0; $i < $size; $i++) {
                 ProcessManger::createProcess(function (Process $worker) {
@@ -74,15 +72,9 @@ class Client
     /**
      * 创建tcpserver
      */
-    protected static function createServer()
+    protected static function createServer($config)
     {
-        ProcessManger::createProcess(function(){
-            $config = [
-                'host' => "127.0.0.1",
-                "port" => "9999",
-                'mode' => SWOOLE_BASE,
-                'setting' => []
-            ];
+        ProcessManger::createProcess(function() use($config){
             $server = Tcp::init($config);
             $server->on('receive',"Client::_Receive");
             $server->on('WorkerStart',"Client::_workStart");
@@ -117,5 +109,5 @@ class Client
     }
 
 }
-
-Client::start();
+$config = include_once __DIR__."/config/config.php";
+Client::start($config);

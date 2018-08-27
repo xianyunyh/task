@@ -13,7 +13,7 @@ class Job
     {
         $table = new Table($size);
         foreach ($columns as $column) {
-            $table->column($columns[0],$column[1],$columns[2]);
+            $table->column($column[0],$column[1],$column[2]);
         }
         $table->create();
         self::$table = $table;
@@ -36,6 +36,10 @@ class Job
             return self::$table->set($key,$data);
         }
         return false;
+    }
+    public static function count ()
+    {
+        return self::$table->count();
     }
 
 
