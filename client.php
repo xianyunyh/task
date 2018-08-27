@@ -7,6 +7,7 @@ use Swoole\Table;
 use Swoole\Timer;
 use Task\Process\ProcessManger;
 use Task\Server\Tcp;
+use Task\Job;
 
 class Client
 {
@@ -23,17 +24,29 @@ class Client
     /**
      * @var Server
      */
+
     protected $server;
+
+    /**
+     * @var Job
+     */
+    protected static $job;
 
     public static function start()
     {
+        $columns = [
+            ["task_id",Table::TYPE_INT,4],
+            ["start_time",Table::TYPE_INT,8],
+            ["cycle",Table::TYPE_INT,4],
+            ["task",Table::TYPE_STRING,1024],
+        ];
 
         //设置主进程名字
         swoole_set_process_name("php:job-master");
         //回收子进程
         ProcessManger::wait();
         //内存表初始化
-        self::initTable(1024);
+        self::$job = Job::init(1024,$columns);
         //拉取远程数据
         //创建tcp server
         self::createServer();
@@ -42,14 +55,6 @@ class Client
         self::timeTick(5000);
     }
 
-    protected static function initTable($size = 1024)
-    {
-        $table = new Table($size);
-        $table->column('data', Table::TYPE_STRING, 1024);
-        $table->create();
-        self::$table = $table;
-        return $table;
-    }
 
     protected static function timeTick($time = 1000)
     {
@@ -106,7 +111,7 @@ class Client
      */
     public static function _Receive(Server $server, int $fd, int $reactor_id, string $data)
     {
-        self::$table->set("user-$fd", ['data' => $data]);
+        self::$job->add("user-$fd", ['data' => $data]);
         $server->send($fd, $data);
         echo json_encode(self::$table->get("user-$fd")) . "\n";
     }
