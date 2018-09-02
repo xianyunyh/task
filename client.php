@@ -103,9 +103,8 @@ class Client
      */
     public static function _Receive(Server $server, int $fd, int $reactor_id, string $data)
     {
-        self::$job->add("user-$fd", ['data' => $data]);
+        (self::$job)::add("user-$fd", ['data' => $data]);
         $server->send($fd, $data);
-        echo json_encode(self::$table->get("user-$fd")) . "\n";
     }
 
 }

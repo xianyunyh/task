@@ -17,7 +17,7 @@ class Job
         }
         $table->create();
         self::$table = $table;
-        return $table;
+        return new self();
     }
 
     public static function add($key,array $data)
