@@ -8,7 +8,7 @@ use Swoole\Timer;
 use Task\Process\ProcessManger;
 use Task\Server\Tcp;
 use Task\Job;
-
+use Task\Subscribe\Redis as TaskRedis;
 class Client
 {
 
@@ -45,9 +45,10 @@ class Client
         //内存表初始化
         self::$job = Job::init(1024,$columns);
         //拉取远程数据
+        self::subscribe();
         //创建tcp server
-        $clientConfig = self::$config['client'];
-        self::createServer($clientConfig);
+        //$clientConfig = self::$config['client'];
+        //self::createServer($clientConfig);
         //定时器
 
         self::timeTick(5000);
@@ -58,6 +59,7 @@ class Client
     {
         Timer::tick($time, function () {
             $size = Job::count();
+            echo "表的大小为$size".PHP_EOL;
             $count = ProcessManger::getProcessNum();
             for ($i = 0; $i < $size; $i++) {
                 ProcessManger::createProcess(function (Process $worker) {
@@ -66,6 +68,12 @@ class Client
                 });
             }
         });
+    }
+
+    protected static function subscribe()
+    {
+        $redis = new TaskRedis(self::$job);
+        $redis->run();   
     }
 
 
