@@ -14,5 +14,10 @@ return [
             'open_eof_check' => true, //打开EOF检测
             'package_eof' => "\r\n", //设置EOF
         ]
+        ],
+    'redis' =>[
+        'host'=>'127.0.0.1',
+        'port'=>6379,
+        'password'=>""
     ]
 ];
