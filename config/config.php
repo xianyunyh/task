@@ -18,6 +18,10 @@ return [
     'redis' =>[
         'host'=>'127.0.0.1',
         'port'=>6379,
-        'password'=>""
-    ]
+        'password'=>"",
+        "topic"=>"pubsub"
+    ],
+    "time_tick" => "5000",
+    "subscribe_type"=>"redis",
+    'subscribe' => "Task\\Subscribe\\Redis"
 ];
