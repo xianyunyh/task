@@ -1,9 +1,19 @@
 <?php
-namespace  Task\Subscribe;
+
+namespace Task\Subscribe;
+
+use Task\Job;
 use Task\Process\ProcessManger;
 use Swoole\Coroutine\Redis as SwooleRedis;
+use Task\Singleton;
+
 class Redis
 {
+    use Singleton;
+
+    /**
+     * @var Job
+     */
     protected $job;
     protected $host = '127.0.0.1';
     protected $port = '6379';
@@ -16,20 +26,25 @@ class Redis
         $this->job = $job;
 
     }
+
     public function run(array $config)
     {
-        ProcessManger::createProcess(function($worker){
-            go(function(){
+        ProcessManger::createProcess(function ($worker) use($config){
+            go(function () use($config) {
                 $redis = new SwooleRedis();
                 $host = $config['host'] ?? $this->host;
                 $port = $config['port'] ?? $this->port;
                 $password = $config['password'] ?? $this->passord;
                 $topic = $config['topic'] ?? $this->topic;
-                $redis->connect($host,$port,$password);
+                $redis->connect($host, $port, $password);
                 while (true) {
                     $values = $redis->subscribe([$topic]);
                     $messge = $values[2];
-                    ($this->job)::add($messge,['data'=>$messge]);                 
+                    $message = json_decode($values[2], true);
+                    if (isset($message['id'])) {
+                        ($this->job)::add($message['id'], ['data' => $messge]);
+                    }
+
                 }
             });
         });

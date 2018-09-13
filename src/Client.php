@@ -53,7 +53,9 @@ class Client
         if(!class_exists($subscribeClass)) {
             throw new \Exception("$subscribeClass not found");
         }
-        (new $subscribeClass(self::$job))->run($config['redis'] ?? []);
+        $instance = $subscribeClass::getInstance(self::$job);
+
+        $instance->run($config['server'] ?? []);
         //定时器
         self::timeTick($config['time_tick'] ?? 5000);
     }
@@ -73,44 +75,4 @@ class Client
             }
         });
     }
-
-
-    /**
-     * 创建tcpserver
-     */
-    protected static function createServer($config)
-    {
-        ProcessManger::createProcess(function() use($config){
-            $server = Tcp::init($config);
-            $server->on('receive',"Client::_Receive");
-            $server->on('WorkerStart',"Client::_workStart");
-            $server->start();
-            return $server;
-        });
-    }
-
-
-    /**
-     * 回调设置进程名字
-     * @param Server $server
-     * @param int $worker_id
-     */
-    public static function _workStart(Server $server, int $worker_id)
-    {
-        swoole_set_process_name("php:TCP-Server");
-    }
-
-    /**
-     * server 回调
-     * @param Server $server
-     * @param int $fd
-     * @param int $reactor_id
-     * @param string $data
-     */
-    public static function _Receive(Server $server, int $fd, int $reactor_id, string $data)
-    {
-        (self::$job)::add("user-$fd", ['data' => $data]);
-        $server->send($fd, $data);
-    }
-
 }

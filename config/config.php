@@ -22,6 +22,6 @@ return [
         "topic"=>"pubsub"
     ],
     "time_tick" => "5000",
-    "subscribe_type"=>"redis",
-    'subscribe' => "Task\\Subscribe\\Redis"
+    "subscribe_type"=>"tcp",
+    'subscribe' => "Task\\Server\\Tcp"
 ];
