@@ -24,6 +24,10 @@ class Job
     {
         return self::$table->set($key,$data);
     }
+    public static function get($key)
+    {
+        return self::$table->get($key);
+    }
 
     public static function remove($key)
     {

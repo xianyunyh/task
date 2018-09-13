@@ -68,15 +68,24 @@ class Client
     protected static function timeTick($time = 1000)
     {
         Timer::tick($time, function () {
-            $size = Job::count();
-            echo "表的大小为$size".PHP_EOL;
+
+
             $count = ProcessManger::getProcessNum();
-            for ($i = 0; $i < $size; $i++) {
-                ProcessManger::createProcess(function (Process $worker) {
-                    echo "hello\n";
+            foreach(Job::$table as $row) {
+                if(!isset($row['command'])) {
+                    continue;
+                }
+                $command = $row['command'];
+                ProcessManger::createProcess(function (Process $worker) use($command) {
+                    $commandArr = explode(" ",$command);
+                    $cmd =  array_shift($commandArr);
+                    $args = $commandArr;
+                    $worker->exec($cmd,$args);
+                    //TODO 通知执行结果 超时判断
                     $worker->exit(0);
                 });
             }
+
         });
     }
 }
