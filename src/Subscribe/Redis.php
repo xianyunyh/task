@@ -6,6 +6,7 @@ use Task\Job;
 use Task\Process\ProcessManger;
 use Swoole\Coroutine\Redis as SwooleRedis;
 use Task\Singleton;
+use Task\Tools\Message;
 
 class Redis
 {
@@ -39,10 +40,10 @@ class Redis
                 $redis->connect($host, $port, $password);
                 while (true) {
                     $values = $redis->subscribe([$topic]);
-                    $messge = $values[2];
-                    $message = json_decode($values[2], true);
+                    $message = $values[2];
+                    $message = Message::decode($message);
                     if (isset($message['id'])) {
-                        ($this->job)::add($message['id'], ['data' => $messge]);
+                        ($this->job)::add($message['id'], ['data' => $message]);
                     }
 
                 }

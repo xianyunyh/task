@@ -5,6 +5,7 @@ use Swoole\Server;
 use Task\Job;
 use Task\Singleton;
 use Task\Process\ProcessManger;
+use Task\Tools\Message;
 
 class Tcp
 {
@@ -63,7 +64,7 @@ class Tcp
      */
     public function _Receive(Server $server, int $fd, int $reactor_id, string $data)
     {
-        $message = json_decode($data,true);
+        $message = Message::decode($data);
         if(isset($message['id'])) {
             (self::$job)::add($message['id'], $message);
         }

@@ -85,7 +85,6 @@ class Client
                     $worker->exit(0);
                 });
             }
-
         });
     }
 }
