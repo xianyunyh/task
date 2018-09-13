@@ -49,13 +49,17 @@ class Client
         //内存表初始化
         self::$job = Job::init(1024,$columns);
         //监听数据
-        $subscribeClass = $config['subscribe'];
+        $subscribeType = $config['subscribe_type'];
+        if(!isset($config['subscribe'][$subscribeType]) || empty($config['subscribe'][$subscribeType])) {
+            throw new \Exception("$subscribeType not configured");
+        }
+        $subscribeClass = $config['subscribe'][$subscribeType]['class'];
         if(!class_exists($subscribeClass)) {
             throw new \Exception("$subscribeClass not found");
         }
         $instance = $subscribeClass::getInstance(self::$job);
 
-        $instance->run($config['server'] ?? []);
+        $instance->run($config[$subscribeType] ?? []);
         //定时器
         self::timeTick($config['time_tick'] ?? 5000);
     }

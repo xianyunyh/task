@@ -65,7 +65,7 @@ class Tcp
     {
         $message = json_decode($data,true);
         if(isset($message['id'])) {
-            (self::$job)::add("user-$fd", ['data' => $data]);
+            (self::$job)::add($message['id'], $message);
         }
         //$server->send($fd, $data);
     }

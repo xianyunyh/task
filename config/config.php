@@ -5,7 +5,7 @@ return [
         "host" => "127.0.0.1",
         "port" => "8090",
     ],
-    "client" => [
+    "tcp" => [
         "host" => "127.0.0.1",
         "port" => "8989",
         "setting"=>[
@@ -23,5 +23,12 @@ return [
     ],
     "time_tick" => "5000",
     "subscribe_type"=>"tcp",
-    'subscribe' => "Task\\Server\\Tcp"
+    'subscribe' => [
+        "tcp"=>[
+            "class"=>"Task\\Subscribe\\Tcp"
+        ],
+        "redis"=>[
+            "class"=>"Task\\Subscribe\\Redis"
+        ]
+    ]
 ];
