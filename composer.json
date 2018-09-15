@@ -1,5 +1,5 @@
 {
-    "name": "tianlei/task",
+    "name": "xianyunyh/task",
     "authors": [
         {
             "name": "xianyunyh",
@@ -11,5 +11,7 @@
         "Task\\": "./src"
       }
     },
-    "require": {}
+    "require": {
+        "monolog/monolog": "^1.23"
+    }
 }

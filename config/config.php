@@ -22,7 +22,11 @@ return [
         "topic"=>"pubsub"
     ],
     "time_tick" => "5000",
-    "subscribe_type"=>"tcp",
+    "subscribe_type"=>"redis",
+    'log' => [
+        'type'=>'file',
+        'path'=>"/tmp/task.log"
+    ],
     'subscribe' => [
         "tcp"=>[
             "class"=>"Task\\Subscribe\\Tcp"

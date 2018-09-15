@@ -41,10 +41,8 @@ class Redis
                 while (true) {
                     $values = $redis->subscribe([$topic]);
                     $message = $values[2];
-                    $message = Message::decode($message);
-                    if (isset($message['id'])) {
-                        ($this->job)::add($message['id'], ['data' => $message]);
-                    }
+                    $messageInstance = Message::getInstance($this->job);
+                    $messageInstance->handler($message);
 
                 }
             });
