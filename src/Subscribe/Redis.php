@@ -2,6 +2,7 @@
 
 namespace Task\Subscribe;
 
+use Swoole\Process;
 use Task\Job;
 use Task\Process\ProcessManger;
 use Swoole\Coroutine\Redis as SwooleRedis;
@@ -30,7 +31,7 @@ class Redis
 
     public function run(array $config)
     {
-        ProcessManger::createProcess(function ($worker) use($config){
+        ProcessManger::createProcess(function (Process $worker) use($config){
             go(function () use($config) {
                 $redis = new SwooleRedis();
                 $host = $config['host'] ?? $this->host;

@@ -17,6 +17,7 @@ class ProcessManger
         $process = new Process($callback,false,false);
         self::$processList[$process->pid] = $process;
         $process->start();
+        return $process;
     }
     /**
      * 回收子进程

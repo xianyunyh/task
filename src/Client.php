@@ -1,21 +1,19 @@
 <?php
 namespace Task;
 
+use Swoole\Exception;
 use Swoole\Process;
-use Swoole\Server;
 use Swoole\Table;
 use Swoole\Timer;
 use Task\Process\ProcessManger;
-use Task\Server\Tcp;
 use Task\Job;
-use Task\Subscribe\Redis as TaskRedis;
 
 class Client
 {
 
 
     /**
-     * @var Swoole\Table
+     * @var Table
      */
     protected static $table;
     /**
@@ -38,14 +36,9 @@ class Client
             ["cycle",Table::TYPE_INT,4],
             ["command",Table::TYPE_STRING,1024],
         ];
-        set_exception_handler(function($exception){
+        set_exception_handler(function( Exception $exception){
             echo "Exception Caught: ". $exception->getMessage() .PHP_EOL;
         });
-
-        //设置主进程名字
-        swoole_set_process_name("php:job-master");
-        //回收子进程
-        ProcessManger::wait();
         //内存表初始化
         self::$job = Job::init(1024,$columns);
         //监听数据
@@ -53,6 +46,7 @@ class Client
         if(!isset($config['subscribe'][$subscribeType]) || empty($config['subscribe'][$subscribeType])) {
             throw new \Exception("$subscribeType not configured");
         }
+
         $subscribeClass = $config['subscribe'][$subscribeType]['class'];
         if(!class_exists($subscribeClass)) {
             throw new \Exception("$subscribeClass not found");
@@ -62,14 +56,16 @@ class Client
         $instance->run($config[$subscribeType] ?? []);
         //定时器
         self::timeTick($config['time_tick'] ?? 5000);
+        //设置主进程名字
+        swoole_set_process_name("php:job-master");
+        //回收子进程
+        ProcessManger::wait();
     }
 
 
     protected static function timeTick($time = 1000)
     {
         Timer::tick($time, function () {
-
-
             $count = ProcessManger::getProcessNum();
             foreach(Job::$table as $row) {
                 if(!isset($row['command'])) {
