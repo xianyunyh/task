@@ -64,11 +64,8 @@ class Tcp
      */
     public function _Receive(Server $server, int $fd, int $reactor_id, string $data)
     {
-        $message = Message::decode($data);
-        if(isset($message['id'])) {
-            (self::$job)::add($message['id'], $message);
-        }
-        //$server->send($fd, $data);
+        $instance = Message::getInstance(self::$job);
+        $instance->handler($data);
     }
 
 }

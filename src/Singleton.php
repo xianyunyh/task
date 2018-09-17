@@ -8,7 +8,7 @@ trait Singleton
     public static function getInstance($job)
     {
         if(!self::$instance) {
-            self::$instance = new self($job);
+            self::$instance = new static($job);
         }
         return self::$instance;
     }
